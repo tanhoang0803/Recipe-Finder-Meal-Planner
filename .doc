@@ -1,0 +1,115 @@
+# Developer Notes — Recipe Finder & Meal Planner
+
+## Setup Checklist
+
+- [ ] Copy `.env.example` to `.env` and fill in all keys
+- [ ] Enable Firebase Auth (Email/Password) in Firebase Console
+- [ ] Create Firestore database in Firebase Console (start in test mode, then add rules)
+- [ ] Register Spoonacular account and grab API key
+- [ ] (Optional) Create OpenAI API key for AI features
+- [ ] Run `npm install` and confirm no peer dependency errors
+- [ ] Run `npm start` and verify app loads at localhost:3000
+
+---
+
+## Spoonacular API Notes
+
+- Base URL: `https://api.spoonacular.com`
+- Auth: query param `?apiKey=YOUR_KEY`
+- Key endpoints:
+  - `GET /recipes/complexSearch?query=pasta` — search by name
+  - `GET /recipes/findByIngredients?ingredients=chicken,garlic` — search by ingredients
+  - `GET /recipes/{id}/information` — full recipe detail
+- Points cost: complexSearch = 1pt, findByIngredients = 1pt, /information = 1pt
+- Cache results in Redux for 10 minutes to avoid burning through daily quota
+- If you hit the daily limit (150pts), the API returns 402. Handle this gracefully.
+
+---
+
+## Firebase Notes
+
+- Firestore document structure for favorites:
+  ```
+  users/{uid}/favorites/{recipeId}
+    → { id, title, image, readyInMinutes, servings, savedAt }
+  ```
+- Firestore document structure for meal plans:
+  ```
+  users/{uid}/mealPlans/{weekId}
+    → { weekId, monday: [], tuesday: [], ..., sunday: [] }
+  ```
+- `weekId` format: `YYYY-WW` (e.g., `2025-14` for week 14 of 2025)
+- Security rules: always scope reads/writes to `request.auth.uid == userId`
+
+---
+
+## OpenAI API Notes
+
+- Model recommendation: `gpt-4o-mini` — cheap and fast, sufficient quality
+- Suggested prompt structure for ingredient-based suggestions:
+  ```
+  "You are a helpful chef assistant. The user has these ingredients: [list].
+   Suggest 5 recipes that use most of these ingredients efficiently.
+   Return a JSON array with: title, ingredients[], estimatedTime, difficulty."
+  ```
+- Always parse AI responses defensively — JSON.parse can throw if the model returns malformed JSON
+- Consider streaming responses for better UX on slow connections
+
+---
+
+## Redux DevTools
+
+Install the browser extension (Chrome/Firefox). In development, you can:
+- Time-travel through state changes
+- Inspect every dispatched action
+- See the exact state diff for each action
+
+Essential for debugging complex state flows in meal planner.
+
+---
+
+## Drag and Drop
+
+Using `@hello-pangea/dnd` (maintained fork of `react-beautiful-dnd`):
+```
+npm install @hello-pangea/dnd
+```
+
+Wrap MealPlanner in `<DragDropContext>`, each day column in `<Droppable>`, each recipe in `<Draggable>`.
+
+On drag end: dispatch `moveRecipe({ from: sourceDay, to: destinationDay, recipeId })` to `mealPlanSlice`.
+
+---
+
+## Common Error Patterns
+
+| Error | Cause | Fix |
+|---|---|---|
+| `402 Payment Required` from Spoonacular | Daily quota exceeded | Add caching, wait 24h, or upgrade tier |
+| `FirebaseError: Missing or insufficient permissions` | Firestore rules block unauthenticated access | Check user is logged in before Firestore calls |
+| `Cannot read properties of null (reading 'uid')` | Reading user before auth resolves | Wait for `onAuthStateChanged` callback |
+| AI response not valid JSON | GPT returned explanation text, not pure JSON | Wrap in try/catch, add `"Respond only with JSON"` to prompt |
+| Redux state not updating | Forgetting to return new state in reducer | Redux Toolkit uses Immer — mutate draft directly OR return new object |
+
+---
+
+## Performance Tips
+
+1. **Debounce search input** — 300ms delay before dispatching `fetchRecipes`
+2. **Memoize RecipeCard** — wrap in `React.memo()` to avoid re-rendering on unrelated state changes
+3. **Virtualize long lists** — if displaying 50+ recipes, use `react-window` for virtualized rendering
+4. **Lazy load images** — add `loading="lazy"` to recipe `<img>` tags
+5. **Code split routes** — use `React.lazy()` for FavoritesPage and MealPlanner if bundle size grows
+
+---
+
+## Testing Strategy
+
+| Type | Tool | What to Test |
+|---|---|---|
+| Unit | Jest | Redux slices, utility functions, service mocks |
+| Component | React Testing Library | Component rendering, user interactions, loading/error states |
+| Integration | Jest + MSW | Full flow: search → slice update → component re-render |
+| E2E (optional) | Playwright | Login, search, save favorite, add to meal plan |
+
+Mock external APIs with `msw` (Mock Service Worker) — this intercepts fetch at the network level, making tests realistic without hitting real APIs.
