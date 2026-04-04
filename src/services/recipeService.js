@@ -40,3 +40,14 @@ export async function searchByIngredients(ingredients) {
 export async function getRecipeById(id) {
   return request(`/recipes/${id}/information`, { includeNutrition: false });
 }
+
+export async function searchRecipeImage(title) {
+  try {
+    // Use first 3 words for a broader Spoonacular match
+    const shortQuery = title.split(' ').slice(0, 3).join(' ');
+    const data = await request('/recipes/complexSearch', { query: shortQuery, number: 1 });
+    return data.results?.[0]?.image ?? '';
+  } catch {
+    return '';
+  }
+}

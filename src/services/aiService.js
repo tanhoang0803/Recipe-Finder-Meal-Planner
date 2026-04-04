@@ -1,17 +1,17 @@
-const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
-const KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 async function chat(systemPrompt, userMessage) {
-  if (!KEY) throw new Error('AI features require an OpenAI API key.');
+  if (!KEY) throw new Error('AI features require a Groq API key.');
 
-  const res = await fetch(OPENAI_URL, {
+  const res = await fetch(GROQ_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'llama-3.1-8b-instant',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user',   content: userMessage },
@@ -20,7 +20,7 @@ async function chat(systemPrompt, userMessage) {
     }),
   });
 
-  if (!res.ok) throw new Error(`OpenAI error: ${res.status}`);
+  if (!res.ok) throw new Error(`Groq error: ${res.status}`);
   const data = await res.json();
   return data.choices[0].message.content;
 }

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { moveRecipe, setWeek, clearMealPlan } from '../../store/mealPlanSlice';
 import { generateWeeklyPlan } from '../../services/aiService';
+import { searchRecipeImage } from '../../services/recipeService';
 import { useToast } from '../Common/Toast';
 import DayColumn from './DayColumn';
 import LoadingSpinner from '../Common/LoadingSpinner';
@@ -31,10 +32,13 @@ export default function MealPlanner() {
       const plan = await generateWeeklyPlan();
       // plan is { monday: title, ... } — convert to { monday: [{ id, title }], ... }
       const newWeek = Object.fromEntries(
-        DAYS.map((day) => [
-          day,
-          plan[day] ? [{ id: `ai-${day}`, title: plan[day], image: '' }] : [],
-        ])
+        await Promise.all(
+          DAYS.map(async (day) => {
+            if (!plan[day]) return [day, []];
+            const image = await searchRecipeImage(plan[day]);
+            return [day, [{ id: `ai-${day}`, title: plan[day], image }]];
+          })
+        )
       );
       dispatch(setWeek(newWeek));
       toast('AI weekly plan generated!', 'success');

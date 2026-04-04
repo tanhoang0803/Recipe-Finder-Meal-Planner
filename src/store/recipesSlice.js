@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { searchRecipes, getRecipeById, searchByIngredients } from '../services/recipeService';
+import { searchRecipes, getRecipeById, searchByIngredients, searchRecipeImage } from '../services/recipeService';
 import { suggestRecipes } from '../services/aiService';
 import { isCacheValid, makeCacheKey } from '../utils/cacheUtils';
 
@@ -46,7 +46,14 @@ export const fetchAISuggestions = createAsyncThunk(
   'recipes/fetchAISuggestions',
   async (ingredients, { rejectWithValue }) => {
     try {
-      return await suggestRecipes(ingredients);
+      const suggestions = await suggestRecipes(ingredients);
+      const withImages = await Promise.all(
+        suggestions.map(async (recipe) => {
+          const image = await searchRecipeImage(recipe.title);
+          return { ...recipe, image };
+        })
+      );
+      return withImages;
     } catch (err) {
       return rejectWithValue(err.message);
     }
