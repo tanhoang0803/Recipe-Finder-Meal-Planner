@@ -16,7 +16,7 @@ Redux Store (Toolkit slices)
 Service Layer (recipeService, authService, aiService)
       │
       ▼
-External APIs (Spoonacular, Firebase, OpenAI)
+External APIs (Spoonacular, Firebase, Groq)
 ```
 
 Each layer has one responsibility. **Never call external APIs directly from components** — always go through the service layer.
@@ -58,7 +58,7 @@ src/
 ├── services/
 │   ├── recipeService.js           # Spoonacular: searchRecipes, getRecipeById
 │   ├── authService.js             # Firebase: signIn, signOut, onAuthChange
-│   └── aiService.js               # OpenAI: suggestRecipes, generateWeeklyPlan
+│   └── aiService.js               # Groq (llama-3.1-8b-instant): suggestRecipes, generateWeeklyPlan
 │
 ├── hooks/
 │   ├── useRecipeSearch.js         # Debounced search hook
@@ -131,6 +131,7 @@ src/
 searchRecipes(query: string, options?: SearchOptions): Promise<Recipe[]>
 getRecipeById(id: number): Promise<RecipeDetail>
 searchByIngredients(ingredients: string[]): Promise<Recipe[]>
+searchRecipeImage(title: string): Promise<string>   // fetches image URL using first 3 words of title
 ```
 
 ### `authService.js`
@@ -158,7 +159,7 @@ generateShoppingList(weeklyPlan: WeeklyPlan): Promise<ShoppingItem[]>
 - **API calls** live exclusively in service files and are dispatched via async thunks (`createAsyncThunk`).
 - **Error handling**: services throw typed errors; slices catch them and populate `error` field; components read `status` and `error` from the slice.
 - **Caching**: before calling Spoonacular, check the `cache` in `recipesSlice`. If the entry exists and is less than 10 minutes old, return cached data.
-- **Environment variables**: all keys come from `process.env.REACT_APP_*`. Never hardcode.
+- **Environment variables**: all keys come from `import.meta.env.VITE_*` (Vite). Never hardcode.
 - **Testing**: each component has a `.test.jsx` file. Services are tested with mocked HTTP calls. Slices are unit-tested in isolation.
 
 ---
@@ -183,10 +184,12 @@ User types in SearchBar
 User enters ingredients in AISuggestForm
   → dispatches fetchAISuggestions(ingredients)
   → aiService.suggestRecipes(ingredients)
-    → builds prompt: "Given [chicken, garlic, rice], suggest 5 recipes..."
-    → calls OpenAI API
+    → builds prompt: "Given [chicken, garlic, rice], suggest 6 recipes..."
+    → calls Groq API (llama-3.1-8b-instant)
     → parses response into AISuggestion[]
-  → recipesSlice.results updated with AI suggestions
+  → for each suggestion: recipeService.searchRecipeImage(title)
+    → Spoonacular returns real food image URL
+  → recipesSlice.results updated with AI suggestions + images
   → RecipeList renders AI results (tagged with source: 'ai')
 ```
 
@@ -210,7 +213,7 @@ User clicks Save on RecipeCard
 | State management | Redux Toolkit | Predictable, scalable, great DevTools |
 | Auth provider | Firebase | Free tier, fast setup, built-in Google OAuth |
 | Recipe API | Spoonacular | Rich data, free tier covers development |
-| AI model | GPT-4o-mini | Low cost, fast, sufficient for recipe suggestions |
+| AI model | Groq llama-3.1-8b-instant | Free tier, very fast, sufficient for recipe suggestions |
 | Styling | Tailwind CSS | Utility-first, rapid prototyping, no CSS bloat |
 | Offline mode | Not implemented | Requires service worker + IndexedDB; out of scope |
 

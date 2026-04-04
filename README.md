@@ -33,7 +33,7 @@ This app deliberately combines patterns that repeat across almost every real-wor
 | Authentication | Firebase Auth |
 | Database / Storage | Firebase Firestore |
 | Recipe Data | Spoonacular API |
-| AI Suggestions | OpenAI API (GPT-4o-mini) |
+| AI Suggestions | Groq API (llama-3.1-8b-instant) — free tier |
 | Hosting | Vercel / Netlify |
 | Styling | Tailwind CSS |
 | Charts (optional) | Chart.js |
@@ -45,14 +45,14 @@ This app deliberately combines patterns that repeat across almost every real-wor
 - npm or yarn
 - Firebase project (free tier)
 - Spoonacular API key (free tier)
-- OpenAI API key (optional, for AI features)
+- Groq API key (free tier, for AI features — [console.groq.com](https://console.groq.com))
 
 ### Steps
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/recipe-planner.git
-cd recipe-planner
+git clone https://github.com/tanhoang0803/Recipe-Finder-Meal-Planner.git
+cd Recipe-Finder-Meal-Planner
 
 # 2. Install dependencies
 npm install
@@ -62,10 +62,10 @@ cp .env.example .env
 # Fill in your API keys in .env (see .env.example for all required variables)
 
 # 4. Start development server
-npm start
+npm run dev
 ```
 
-The app will run at `http://localhost:3000`.
+The app will run at `http://localhost:5173`.
 
 ## Project Structure
 
@@ -98,14 +98,14 @@ See `.env.example` for the full list of required keys. Never commit your `.env` 
 
 ## API Rate Limits
 
-- **Spoonacular free tier**: 150 points/day — results are cached in Redux to minimize calls.
-- **OpenAI**: pay-per-use — AI suggestions are only triggered on explicit user action.
+- **Spoonacular free tier**: 150 points/day — results are cached in Redux to minimize calls. AI recipes also fetch images via Spoonacular using a shortened title query.
+- **Groq free tier**: ~14,400 requests/day — more than enough for development and personal use.
 - **Firebase free tier (Spark)**: generous limits suitable for development and small production loads.
 
 ## Scripts
 
 ```bash
-npm start        # Development server
+npm run dev      # Development server (http://localhost:5173)
 npm run build    # Production build
 npm test         # Run tests
 npm run lint     # ESLint check

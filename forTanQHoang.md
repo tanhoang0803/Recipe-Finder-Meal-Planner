@@ -72,7 +72,7 @@ Component re-renders with new data
 - **Redux Toolkit**: The modern way to use Redux. Not the old verbose way (no more `switch` statements in reducers).
 - **Firebase**: Free. Fast to set up. Auth + database in one platform. Perfect for a solo project.
 - **Spoonacular**: Real recipe data with nutrition info, images, and ingredients. The free tier gives 150 request points/day — enough to build and demo.
-- **OpenAI GPT-4o-mini**: Cheap, fast, good enough. Don't use GPT-4 for this — it costs 15x more and the result quality difference is minimal for recipe suggestions.
+- **Groq (llama-3.1-8b-instant)**: Free, very fast (~500 tokens/sec), good enough for recipe suggestions. OpenAI was the original plan but requires paid credits. Groq gives you the same OpenAI-compatible API for free — swap the URL and model name, nothing else changes.
 - **Tailwind CSS**: You'll never go back to writing raw CSS for layout after using Tailwind. Utility classes are fast.
 
 ---
@@ -91,6 +91,22 @@ Component re-renders with new data
 ---
 
 ## Step 6: Mistakes — What I Got Wrong and Fixed
+
+### Mistake 0: Assuming AI returns images
+
+**What happened**: The AI (Groq/OpenAI) can suggest recipe *names* but cannot provide food photos — it has no image generation or lookup capability.
+
+**Fix**: After the AI returns recipe titles, call `recipeService.searchRecipeImage(title)` to fetch a real photo from Spoonacular. Use only the first 3 words of the title for the search query — long AI-generated titles like "Grilled Salmon with Quinoa and Steamed Broccoli" often don't match Spoonacular exactly, but "Grilled Salmon with" does.
+
+```js
+const image = await searchRecipeImage(recipe.title);  // first 3 words used internally
+return { ...recipe, image };
+```
+
+This applies to both AI recipe suggestions **and** the AI weekly meal planner.
+
+---
+
 
 ### Mistake 1: Calling the API directly in the component
 
@@ -142,7 +158,7 @@ Never do this. Even in a "private" repo. Use `.env` from day one.
 
 3. **Redux slice bloat**: The most common Redux mistake is putting unrelated state in the same slice. If you find yourself adding `favoritesLoading` to `recipesSlice`, stop — that belongs in `favoritesSlice`.
 
-4. **AI prompt engineering**: Your AI suggestions are only as good as your prompt. Test it manually in the OpenAI Playground before wiring it to your app. Start with a simple prompt, then iterate.
+4. **AI prompt engineering**: Your AI suggestions are only as good as your prompt. Test it manually in the Groq Playground (console.groq.com) before wiring it to your app. Start with a simple prompt, then iterate. Always instruct the model to return pure JSON — no markdown fences, no explanation — or your `JSON.parse()` will break.
 
 5. **Drag-and-drop**: `react-beautiful-dnd` is deprecated. Use `@hello-pangea/dnd` (drop-in replacement, actively maintained). Don't write your own drag-and-drop logic — it's one of the hardest UI patterns to get right.
 
