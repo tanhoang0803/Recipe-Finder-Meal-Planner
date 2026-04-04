@@ -41,12 +41,40 @@ export async function getRecipeById(id) {
   return request(`/recipes/${id}/information`, { includeNutrition: false });
 }
 
-export async function searchRecipeImage(title) {
+const IMAGE_CACHE_KEY = 'recipe_image_cache';
+const IMAGE_CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
+
+function getImageCache() {
   try {
-    // Use first 3 words for a broader Spoonacular match
-    const shortQuery = title.split(' ').slice(0, 3).join(' ');
+    return JSON.parse(localStorage.getItem(IMAGE_CACHE_KEY) ?? '{}');
+  } catch {
+    return {};
+  }
+}
+
+function setImageCache(cache) {
+  try {
+    localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // localStorage full — ignore
+  }
+}
+
+export async function searchRecipeImage(title) {
+  const shortQuery = title.split(' ').slice(0, 3).join(' ').toLowerCase();
+  const cache = getImageCache();
+  const entry = cache[shortQuery];
+
+  if (entry && Date.now() - entry.timestamp < IMAGE_CACHE_TTL) {
+    return entry.image;
+  }
+
+  try {
     const data = await request('/recipes/complexSearch', { query: shortQuery, number: 1 });
-    return data.results?.[0]?.image ?? '';
+    const image = data.results?.[0]?.image ?? '';
+    cache[shortQuery] = { image, timestamp: Date.now() };
+    setImageCache(cache);
+    return image;
   } catch {
     return '';
   }
