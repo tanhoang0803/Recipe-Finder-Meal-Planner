@@ -48,7 +48,8 @@ const mealPlanSlice = createSlice({
       .addCase(loadMealPlan.pending,   (state) => { state.status = 'loading'; })
       .addCase(loadMealPlan.fulfilled, (state, { payload }) => {
         state.status = 'succeeded';
-        const { weekId: _weekId, ...days } = payload;
+        // eslint-disable-next-line no-unused-vars
+        const { weekId, ...days } = payload;
         state.week = { ...emptyWeek(), ...days };
       })
       .addCase(loadMealPlan.rejected,  (state) => { state.status = 'failed'; });
