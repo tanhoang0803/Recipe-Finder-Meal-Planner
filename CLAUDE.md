@@ -219,6 +219,18 @@ User clicks Save on RecipeCard
 
 ---
 
+## Deployment
+
+- **Live URL**: https://recipe-finder-meal-planner-jet.vercel.app/
+- **Hosting**: Vercel (auto-deploys on every push to `main`)
+- **CI/CD**: GitHub Actions (`.github/workflows/`)
+  - `ci.yml` — runs lint + tests on every push and PR
+  - `deploy.yml` — builds and deploys to Vercel on push to `main`
+- **Secrets**: all `VITE_*` env vars stored in GitHub repository secrets
+- **Image cache**: recipe images cached in `localStorage` with 7-day TTL to reduce Spoonacular API usage
+
+---
+
 ## Common Pitfalls to Avoid
 
 1. **API key exposure** — never commit `.env`. Use `.env.example` as template.

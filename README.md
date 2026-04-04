@@ -1,5 +1,7 @@
 # Recipe Finder & Meal Planner
 
+**Live Demo:** https://recipe-finder-meal-planner-jet.vercel.app/
+
 ## Overview
 
 A full-stack web application that helps users discover recipes, organize favorites, and plan weekly meals with AI-powered suggestions. Built with a senior engineer's mindset: clean architecture, predictable state, and scalable integration patterns.
