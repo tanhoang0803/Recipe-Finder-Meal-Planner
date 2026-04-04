@@ -58,7 +58,7 @@ export default function Dashboard() {
 
       {/* This week's plan summary */}
       <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-        <h2 className="font-semibold text-gray-800 mb-4">This Week's Plan</h2>
+        <h2 className="font-semibold text-gray-800 mb-4">This Week&apos;s Plan</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {DAYS.map((day) => (
             <div key={day} className="min-w-0">

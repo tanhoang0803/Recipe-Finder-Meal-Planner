@@ -73,7 +73,7 @@ export default function MealPlanner() {
       </div>
 
       <p className="text-xs text-gray-500 mb-4">
-        Drag recipes between days. Add recipes from the Search page using the "+ Plan" button.
+        Drag recipes between days. Add recipes from the Search page using the &quot;+ Plan&quot; button.
       </p>
 
       <DragDropContext onDragEnd={onDragEnd}>

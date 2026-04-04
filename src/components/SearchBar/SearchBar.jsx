@@ -2,11 +2,8 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRecipeSearch } from '../../hooks/useRecipeSearch';
 import { fetchByIngredients } from '../../store/recipesSlice';
-import { useToast } from '../Common/Toast';
-
 export default function SearchBar() {
   const dispatch             = useDispatch();
-  const toast                = useToast();
   const { search, clear }    = useRecipeSearch();
   const [query, setQuery]    = useState('');
   const [mode, setMode]      = useState('name'); // 'name' | 'ingredients'
