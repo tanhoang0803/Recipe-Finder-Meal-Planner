@@ -1,5 +1,7 @@
 # Recipe Finder & Meal Planner
 
+![CI](https://github.com/tanhoang0803/Recipe-Finder-Meal-Planner/actions/workflows/ci.yml/badge.svg) ![Deploy to Vercel](https://github.com/tanhoang0803/Recipe-Finder-Meal-Planner/actions/workflows/deploy.yml/badge.svg)
+
 **Live Demo:** https://recipe-finder-meal-planner-jet.vercel.app/
 
 ## Overview
