@@ -1,6 +1,12 @@
 # Recipe Finder & Meal Planner
 
-![CI](https://github.com/tanhoang0803/Recipe-Finder-Meal-Planner/actions/workflows/ci.yml/badge.svg) ![Deploy to Vercel](https://github.com/tanhoang0803/Recipe-Finder-Meal-Planner/actions/workflows/deploy.yml/badge.svg)
+## Status & Stack
+
+![CI](https://github.com/tanhoang0803/Recipe-Finder-Meal-Planner/actions/workflows/ci.yml/badge.svg) [![Deployed](https://img.shields.io/badge/Deployed-Vercel-000000?logo=vercel&logoColor=white)](https://recipe-finder-meal-planner-jet.vercel.app/)
+
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black) ![Redux](https://img.shields.io/badge/Redux-Toolkit-764ABC?logo=redux&logoColor=white) ![Firebase](https://img.shields.io/badge/Firebase-10-FFCA28?logo=firebase&logoColor=black) ![Tailwind](https://img.shields.io/badge/Tailwind-3.4-38B2AC?logo=tailwind-css&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white) ![Spoonacular](https://img.shields.io/badge/API-Spoonacular-4CAF50) ![Groq](https://img.shields.io/badge/AI-Groq-F55036)
+
+![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=github-actions&logoColor=white)
 
 **Live Demo:** https://recipe-finder-meal-planner-jet.vercel.app/
 
